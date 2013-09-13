@@ -11,11 +11,11 @@
     #import "RMGlobalConstants.h"
 #endif
 
-#if DEBUG
+#if defined(DEBUG) && !defined(SILENCE_MAPBOX_LOGGING)
 #define RMLog(args...) NSLog(@"%@", [NSString stringWithFormat: args])
 #define LogMethod() NSLog(@"logged method call: -[%@ %@] (line %d)", self, NSStringFromSelector(_cmd), __LINE__)
 #define WarnDeprecated() NSLog(@"***** WARNING: deprecated method call: -[%@ %@] (line %d)", self, NSStringFromSelector(_cmd), __LINE__)
-#else  
+#else
 // DEBUG not defined:
 
 #define RMLog(args...)    // do nothing.
