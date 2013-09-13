@@ -2834,11 +2834,8 @@
 
     [sortedAnnotations filterUsingPredicate:[NSPredicate predicateWithFormat:@"isUserLocationAnnotation = NO"]];
 
-    [sortedAnnotations sortUsingComparator:^(id obj1, id obj2)
+    [sortedAnnotations sortUsingComparator:^(RMAnnotation *annotation1, RMAnnotation *annotation2)
     {
-        RMAnnotation *annotation1 = (RMAnnotation *)obj1;
-        RMAnnotation *annotation2 = (RMAnnotation *)obj2;
-
         // clusters above/below non-clusters (based on _orderClusterMarkersAboveOthers)
         //
         if (   annotation1.isClusterAnnotation && ! annotation2.isClusterAnnotation)
@@ -2846,6 +2843,16 @@
 
         if ( ! annotation1.isClusterAnnotation &&   annotation2.isClusterAnnotation)
             return (_orderClusterMarkersAboveOthers ? NSOrderedAscending : NSOrderedDescending);
+        
+        // place annotations layers of the same type with showAboveOtherAnnotations YES above
+        //
+        if ( [annotation1.layer class] == [annotation2.layer class]) {
+            if (annotation1.showAboveOtherAnnotations) {
+                return NSOrderedDescending;
+            } else if (annotation2.showAboveOtherAnnotations) {
+                return NSOrderedAscending;
+            }
+        }
 
         // markers above shapes
         //

@@ -73,6 +73,7 @@
     self.quadTreeNode = nil;
 
     self.annotationType    = nil;
+    self.showAboveOtherAnnotations = NO;
     self.annotationIcon    = nil;
     self.badgeIcon         = nil;
     self.anchorPoint       = CGPointZero;
