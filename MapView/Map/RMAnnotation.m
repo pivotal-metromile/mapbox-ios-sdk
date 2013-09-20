@@ -102,7 +102,7 @@
     if (!self.hasBoundingBox)
         self.projectedBoundingBox = RMProjectedRectMake(self.projectedLocation.x, self.projectedLocation.y, 1.0, 1.0);
 
-    [self.quadTreeNode performSelector:@selector(annotationDidChangeBoundingBox:) withObject:self];
+    [self.quadTreeNode annotationDidChangeBoundingBox:self];
 }
 
 - (void)setMapView:(RMMapView *)aMapView

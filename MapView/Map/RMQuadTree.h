@@ -61,6 +61,8 @@ typedef enum : short {
 @property (nonatomic, weak, readonly) NSArray *enclosedAnnotations;
 @property (nonatomic, weak, readonly) NSArray *unclusteredAnnotations;
 
+- (void)annotationDidChangeBoundingBox:(RMAnnotation *)annotation;
+
 @end
 
 #pragma mark - RMQuadTree
