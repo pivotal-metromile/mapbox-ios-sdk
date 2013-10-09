@@ -2843,7 +2843,13 @@
 
         if ( ! annotation1.isClusterAnnotation &&   annotation2.isClusterAnnotation)
             return (_orderClusterMarkersAboveOthers ? NSOrderedAscending : NSOrderedDescending);
-        
+
+        if (annotation1.showAsTopAnnotation) {
+            return NSOrderedDescending;
+        } else if (annotation2.showAsTopAnnotation) {
+            return NSOrderedAscending;
+        }
+
         // place annotations layers of the same type with showAboveOtherAnnotations YES above
         //
         if (annotation1.showAboveOtherAnnotations) {

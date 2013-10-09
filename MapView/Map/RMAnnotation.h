@@ -71,8 +71,11 @@
 /** An arbitrary string representing the type of annotation. Useful for determining which layer to draw for the annotation when requested in the delegate. Cluster annotations, which are automatically created by a map view, will automatically have an annotationType of `RMClusterAnnotation`. */
 @property (nonatomic, strong) NSString *annotationType;
 
-/** A BOOL that indicates wether the annotation's layer should be shown above layers of annotations with the same type. */
+/** A BOOL that indicates whether the annotation's layer should be shown above layers of annotations. */
 @property (nonatomic, assign) BOOL showAboveOtherAnnotations;
+
+/** A BOOL that indicates that an annotation should be shown on top. */
+@property  (nonatomic, assign) BOOL showAsTopAnnotation;
 
 /** An arbitrary icon image for the annotation. Useful to pass an image at annotation creation time for use in the layer at a later time. */
 @property (nonatomic, strong) UIImage *annotationIcon;
