@@ -1781,7 +1781,7 @@
 
         [self correctPositionOfAllAnnotations];
 
-        anAnnotation.layer.zPosition = _currentCallout.layer.zPosition = MAXFLOAT;
+        _currentCallout.layer.zPosition = MAXFLOAT;
 
         if (_delegateHasDidSelectAnnotation)
             [_delegate mapView:self didSelectAnnotation:anAnnotation];
@@ -2846,12 +2846,10 @@
         
         // place annotations layers of the same type with showAboveOtherAnnotations YES above
         //
-        if ( [annotation1.layer class] == [annotation2.layer class]) {
-            if (annotation1.showAboveOtherAnnotations) {
-                return NSOrderedDescending;
-            } else if (annotation2.showAboveOtherAnnotations) {
-                return NSOrderedAscending;
-            }
+        if (annotation1.showAboveOtherAnnotations) {
+            return NSOrderedDescending;
+        } else if (annotation2.showAboveOtherAnnotations) {
+            return NSOrderedAscending;
         }
 
         // markers above shapes
@@ -2878,11 +2876,6 @@
 
     for (CGFloat i = 0; i < [sortedAnnotations count]; i++)
         ((RMAnnotation *)[sortedAnnotations objectAtIndex:i]).layer.zPosition = (CGFloat)i;
-
-    // bring any active callout annotation to the front
-    //
-    if (_currentAnnotation)
-        _currentAnnotation.layer.zPosition = _currentCallout.layer.zPosition = MAXFLOAT;
 }
 
 - (NSArray *)annotations
