@@ -112,8 +112,6 @@
 
 @implementation RMMapView
 {
-    id <RMMapViewDelegate> _delegate;
-
     BOOL _delegateHasBeforeMapMove;
     BOOL _delegateHasAfterMapMove;
     BOOL _delegateHasBeforeMapZoom;
@@ -179,7 +177,7 @@
     UIImageView *_userHeadingTrackingView;
     UIImageView *_userHaloTrackingView;
 
-    UIViewController *_viewControllerPresentingAttribution;
+    __weak UIViewController *_viewControllerPresentingAttribution;
     UIButton *_attributionButton;
 
     CGAffineTransform _mapTransform;
@@ -506,11 +504,6 @@
 #pragma mark -
 #pragma mark Delegate
 
-- (id <RMMapViewDelegate>)delegate
-{
-	return _delegate;
-}
-
 - (void)setDelegate:(id <RMMapViewDelegate>)aDelegate
 {
     if (_delegate == aDelegate)
@@ -601,25 +594,23 @@
     {
         BOOL flag = wasUserEvent;
 
-        if ([_zoomDelegateQueue operationCount] == 0)
+        if ([_zoomDelegateQueue operationCount] == 0 && _delegateHasBeforeMapZoom)
         {
             dispatch_async(dispatch_get_main_queue(), ^(void)
             {
-                if (_delegateHasBeforeMapZoom)
-                    [_delegate beforeMapZoom:self byUser:flag];
+                [_delegate beforeMapZoom:self byUser:flag];
             });
         }
 
         [_zoomDelegateQueue setSuspended:YES];
 
-        if ([_zoomDelegateQueue operationCount] == 0)
+        if ([_zoomDelegateQueue operationCount] == 0 && _delegateHasAfterMapZoom)
         {
             [_zoomDelegateQueue addOperationWithBlock:^(void)
             {
                 dispatch_async(dispatch_get_main_queue(), ^(void)
                 {
-                    if (_delegateHasAfterMapZoom)
-                        [_delegate afterMapZoom:self byUser:flag];
+                    [_delegate afterMapZoom:self byUser:flag];
                 });
             }];
         }
