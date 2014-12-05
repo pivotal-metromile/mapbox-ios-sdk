@@ -1,5 +1,5 @@
 //
-//  RMCompositeSource.h
+//  RMGreatCircleAnnotation.h
 //  MapView
 //
 // Copyright (c) 2008-2013, Route-Me Contributors
@@ -26,25 +26,22 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#import "RMAbstractMercatorTileSource.h"
+#import "RMShapeAnnotation.h"
 
-/** RMCompositeSource combines two or more other tile sources, compositing them into a single image per tile and caching that composited result to the tile cache.
-*
-*   RMCompositeSource can have better performance for instances of fully opaque tiles that are layered above other tiles in the tile source stacking order. It will determine if a tile is opaque and stop iteration of tile sources below it early as a result, since they would be obscured anyway. */
-@interface RMCompositeSource : RMAbstractMercatorTileSource
+/** An RMGreatCircleAnnotation class represents a line shape that traces the shortest path along the surface of the Earth. You specify a great circle (also known as a geodesic polyline) using a pair of points. When displayed on a two-dimensional map view, the line segment between the two points may appear curved. */
+@interface RMGreatCircleAnnotation : RMShapeAnnotation
 
-/** @name Creating Tile Sources */
+/** Initialize a great circle annotation using the specified coordinates.
+*   @param aMapView The map view on which to place the annotation.
+*   @param coordinate1 The starting coordinate.
+*   @param coordinate2 The ending coordinate. 
+*   @return An initialized great circle annotation object, or `nil` if an annotation was unable to be initialized. */
+- (id)initWithMapView:(RMMapView *)aMapView coordinate1:(CLLocationCoordinate2D)coordinate1 coordinate2:(CLLocationCoordinate2D)coordinate2;
 
-/** Initialize a compositing tile source.
-*
-*   @param tileSources An array of tile sources to be composited.
-*   @param tileCacheKey A tile cache key for storage of composited result tiles. 
-*   @return An initialized compositing tile source. */
-- (id)initWithTileSources:(NSArray *)tileSources tileCacheKey:(NSString *)tileCacheKey;
+/** The starting coordinate of the annotation. */
+@property (nonatomic, readonly, assign) CLLocationCoordinate2D coordinate1;
 
-/** @name Querying Tile Source Information */
-
-/** An array of tile sources being composited. */
-@property (nonatomic, weak, readonly) NSArray *tileSources;
+/** The ending coordinate of the annotation. */
+@property (nonatomic, readonly, assign) CLLocationCoordinate2D coordinate2;
 
 @end
