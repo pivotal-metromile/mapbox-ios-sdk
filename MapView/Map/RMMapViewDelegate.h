@@ -32,6 +32,14 @@
 @class RMUserLocation;
 
 typedef enum : NSUInteger {
+    RMMapLayerDragStateNone = 0,
+    RMMapLayerDragStateStarting,
+    RMMapLayerDragStateDragging,
+    RMMapLayerDragStateCanceling,
+    RMMapLayerDragStateEnding
+} RMMapLayerDragState;
+
+typedef enum : NSUInteger {
     RMUserTrackingModeNone              = 0,
     RMUserTrackingModeFollow            = 1,
     RMUserTrackingModeFollowWithHeading = 2
@@ -55,6 +63,33 @@ typedef enum : NSUInteger {
 *   @param annotation The object representing the annotation that is about to be displayed. In addition to your custom annotations, this object could be an RMUserLocation object representing the user’s current location.
 *   @return The annotation layer to display for the specified annotation or `nil` if you do not want to display a layer. */
 - (RMMapLayer *)mapView:(RMMapView *)mapView layerForAnnotation:(RMAnnotation *)annotation;
+
+/** Returns a block used for determining the display sort order of annotation layers. The block will be called repeatedly during map change events to ensure annotation layers stay sorted in the desired order.
+*
+*   If you do not implement this method, a default sort order will be used as follows: 
+*
+*   1. User location annotations are below all others. These can be distinguished by `annotation.isUserLocationAnnotation = YES`.
+*
+*   1. Amongst user location annotations, the accuracy circle is below the tracking halo, which is below the user location. These can be distinguished by `annotation.annotationType = kRMTrackingHaloAnnotationTypeName`, `annotation.annotationType = kRMAccuracyCircleAnnotationTypeName`, and checking annotation object type against RMUserLocation.
+*
+*   1. Cluster annotations are above non-cluster annotations. These can be distinguished by `annotation.isClusterAnnotation = YES`. 
+*
+*   1. Markers are above shapes. These can be distinguished by checking annotation object type against RMMarker. 
+*
+*   1. The remaining annotations are sorted with those closer to the bottom of the view above those closer to the top of the view. This includes during user tracking mode map rotation events, when markers always remain upright and their relative layer positions change.
+*
+*   In all cases, any currently selected annotation (and its callout, if visible) are shown above all other annotations. When deselected, the desired sort order is reapplied.
+*
+*   Your implementation of this method should be as lightweight as possible to avoid affecting map renderering performance. 
+*
+*   @see [RMAnnotation isUserLocationAnnotation]
+*   @see [RMAnnotation annotationType]
+*   @see [RMAnnotation isClusterAnnotation]
+*   @see [RMMapView coordinateToPixel:]
+*
+*   @param mapView The map view whose annotations need sorting. 
+*   @return A comparison block to use in order to sort the annotations. */
+- (NSComparator)annotationSortingComparatorForMapView:(RMMapView *)mapView;
 
 /** Tells the delegate that the visible layer for an annotation is about to be hidden from view due to scrolling or zooming the map.
 *   @param mapView The map view whose annotation alyer will be hidden.
@@ -168,25 +203,19 @@ typedef enum : NSUInteger {
 - (void)tapOnCalloutAccessoryControl:(UIControl *)control forAnnotation:(RMAnnotation *)annotation onMap:(RMMapView *)map;
 
 /** Asks the delegate whether the user should be allowed to drag the layer for an annotation. 
-*   @param map The map view. 
+*   @param mapView The map view.
 *   @param annotation The annotation the user is attempting to drag. 
-*   @return A Boolean value indicating whether the user should be allowed to drag the annotation layer. */
-- (BOOL)mapView:(RMMapView *)map shouldDragAnnotation:(RMAnnotation *)annotation;
+*   @return A Boolean value indicating whether the user should be allowed to drag the annotation's layer. */
+- (BOOL)mapView:(RMMapView *)mapView shouldDragAnnotation:(RMAnnotation *)annotation;
 
-/** Tells the delegate that the user is dragging an annotation layer. 
+/** Tells the delegate that the drag state of one of its annotations changed.
 *
-*   If the screen location of the annotation layer should be changed, you are responsible for adjusting it.
-*   @param map The map view. 
-*   @param annotation The annotation being dragged. 
-*   @param delta The delta of movement since the last drag notification. */
-- (void)mapView:(RMMapView *)map didDragAnnotation:(RMAnnotation *)annotation withDelta:(CGPoint)delta;
-
-/** Tells the delegate that the user has finished dragging an annotation layer. 
-*
-*   If the screen position of the annotation layer has been changed since the drag operation started, you should update its coordinate to the final location in order to ensure that the annotation is displayed there going forward. Otherwise, the next time the annotations are adjusted, it will revert to its original position from before the drag. 
-*   @param map The map view. 
-*   @param annotation The annotation that was dragged. */
-- (void)mapView:(RMMapView *)map didEndDragAnnotation:(RMAnnotation *)annotation;
+*   The drag state typically changes in response to user interactions with the annotation layer. However, the annotation layer itself is responsible for changing that state as well.
+*   @param mapView The map view containing the annotation layer.
+*   @param annotation The annotation whose drag state changed.
+*   @param newState The new drag state of the annotation layer. 
+*   @param oldState The previous drag state of the annotation layer. */
+- (void)mapView:(RMMapView *)mapView annotation:(RMAnnotation *)annotation didChangeDragState:(RMMapLayerDragState)newState fromOldState:(RMMapLayerDragState)oldState;
 
 /** @name Tracking the User Location */
 
